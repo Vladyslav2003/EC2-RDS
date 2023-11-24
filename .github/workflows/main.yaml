@@ -34,6 +34,10 @@ jobs:
           while true; do
             response=$(curl -s "https://api.github.com/repos/corp/org-shared-sre-cicd/pulls/${{ steps.create_pr.outputs.pr_number }}/reviews" -H "Authorization: Bearer ${{ secrets.GH_TOKEN_SRE }}")
 
+            echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+            echo "${response}"
+            echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+            
             approved=$(echo "${response}" | jq -r '.[] | select(.state == "APPROVED")')
             user=$(echo "${response}" | jq -r '.[] | select(.state == "APPROVED")| .user.login')
 
