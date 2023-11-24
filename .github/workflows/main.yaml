@@ -32,7 +32,7 @@ jobs:
           branch_name="${{ steps.create_br.outputs.branch_name }}"
 
           while true; do
-            response=$(curl -s "https://api.github.com/repos/corp/org-shared-sre-cicd/pulls/${{ steps.create_pr.outputs.pr_number }}/reviews" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}")
+            response=$(curl -s "https://api.github.com/Vladyslav2003/EC2-RDS/pulls/${{ steps.create_pr.outputs.pr_number }}/reviews" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}")
 
             echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
             echo "${response}"
