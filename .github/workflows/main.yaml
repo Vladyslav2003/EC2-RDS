@@ -23,3 +23,42 @@ jobs:
       - name: Terraform Plan
         id: Plan
         run: terraform plan
+
+      - name: Wait for Approval
+        id: wait_for_approval
+        run: |
+          workflow_run_id="${{ github.run_id }}"
+          pr_number="${{ steps.create_pr.outputs.pr_number }}"
+          branch_name="${{ steps.create_br.outputs.branch_name }}"
+
+          while true; do
+            response=$(curl -s "https://api.github.com/repos/corp/org-shared-sre-cicd/pulls/${{ steps.create_pr.outputs.pr_number }}/reviews" -H "Authorization: Bearer ${{ secrets.GH_TOKEN_SRE }}")
+
+            approved=$(echo "${response}" | jq -r '.[] | select(.state == "APPROVED")')
+            user=$(echo "${response}" | jq -r '.[] | select(.state == "APPROVED")| .user.login')
+
+            if [[ -n "${approved}" ]]; then
+              break
+            fi
+
+            sleep 10
+            ((counter+=10))
+          
+            if [[ $counter -ge 1800 ]]; then
+              echo "Timeout reached for Approval -30m . Exiting..."
+              echo "approval_status=not-approved" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+          done
+          
+          echo "approval_status=approved" >> $GITHUB_OUTPUT
+          echo "user_status=${user}" >> $GITHUB_OUTPUT
+
+          echo $user_status
+
+          sleep 10
+          curl -X PUT -H "Authorization: Bearer ${{ secrets.GH_TOKEN_SRE }}" -H "Accept: application/vnd.github.v3+json" "https://api.github.com/repos/corp/org-shared-sre-cicd/pulls/${pr_number}/merge"
+
+      - name: Run Subsequent Steps
+        if: steps.wait_for_approval.outputs.approval_status == 'approved'
+        run: terraform apply --auto-approve
