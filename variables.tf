@@ -19,6 +19,7 @@ variable "ami_id" {
 
 variable "number_of_instances" {
        type=number
+       default = 1
 }
 
 
