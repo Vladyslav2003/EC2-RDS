@@ -12,7 +12,7 @@ on:
    paths:
    - terraform/**
  
-   workflow_dispatch:
+ workflow_dispatch:
     inputs:
       number_of_instances:
         description: 'number_of_instances'
