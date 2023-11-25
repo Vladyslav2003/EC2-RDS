@@ -39,6 +39,8 @@ jobs:
     needs: terraform
     environment:
       name: prod
+    env:
+      TF_VAR_number_of_instances: ${{ inputs.number_of_instances }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
