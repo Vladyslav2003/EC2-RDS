@@ -1,55 +1,3 @@
-name: "Terraform"
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    
-  workflow_dispatch:
-    inputs:
-      number_of_instances:
-        description: 'number_of_instances'
-        required: true
-        type: number
-
-jobs:
-  terraform:
-    name: "Terraform"
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-    env:
-      TF_VAR_number_of_instances: ${{ inputs.number_of_instances }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Terraform Init
-        id: init
-        run: terraform init
-
-      - name: Terraform Plan
-        id: Plan
-        run: terraform plan
-
-  terraform_apply:
-    name: "Terraform Apply"
-    runs-on: ubuntu-latest
-    needs: terraform
-    environment:
-      name: prod
-    env:
-      TF_VAR_number_of_instances: ${{ inputs.number_of_instances }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Terraform Apply
-        run: terraform apply
-
-
-
 # name: "Terraform"
 
 # on:
@@ -57,13 +5,13 @@ jobs:
 #     branches:
 #       - main
 #   pull_request:
-    
+
 #   workflow_dispatch:
-#         inputs:
-#           number_of_instances:
-#             description: 'number_of_instances'
-#             required: true
-#             type: number
+#     inputs:
+#       number_of_instances:
+#         description: 'number_of_instances'
+#         required: true
+#         type: number
 
 # jobs:
 #   terraform:
@@ -85,3 +33,59 @@ jobs:
 #         id: Plan
 #         run: terraform plan
 
+#   terraform_apply:
+#     name: "Terraform Apply"
+#     runs-on: ubuntu-latest
+#     needs: terraform
+#     environment:
+#       name: prod
+#     env:
+#      TF_VAR_number_of_instances: ${{ inputs.number_of_instances }}
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v3
+
+#       - name: Terraform Apply
+#         run: terraform apply
+
+name: "Terraform Menu"
+
+on:
+  workflow_dispatch:
+    inputs:
+      menu-option:
+       description: "Select an option"
+         required: true
+         default: "plan"
+         options:
+          - "plan"
+          - "apply"
+          - "destroy"
+
+jobs:
+  terraform:
+    name: "Terraform"
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Set Terraform Action
+        id: set-terraform-action
+        run: echo "echo ::set-output name=terraform_action::${{ github.event.inputs.menu-option }}"
+
+  apply_or_destroy:
+    name: "Apply or Destroy"
+    runs-on: ubuntu-latest
+    needs: terraform
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Terraform Apply or Destroy
+        run: terraform ${{ needs.terraform.outputs.terraform_action }}

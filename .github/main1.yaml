@@ -1,0 +1,41 @@
+name: "Terraform Menu"
+
+on:
+  workflow_dispatch:
+    inputs:
+      menu-option:
+        description: 'Select an option'
+        required: true
+        default: 'plan'
+        options:
+          - 'plan'
+          - 'apply'
+          - 'destroy'
+
+jobs:
+  terraform:
+    name: "Terraform"
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Set Terraform Action
+        id: set-terraform-action
+        run: echo "echo ::set-output name=terraform_action::${{ github.event.inputs.menu-option }}"
+
+  apply_or_destroy:
+    name: "Apply or Destroy"
+    runs-on: ubuntu-latest
+    needs: terraform
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Terraform Apply or Destroy
+        run: terraform ${{ needs.terraform.outputs.terraform_action }}
