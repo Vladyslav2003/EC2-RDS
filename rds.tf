@@ -30,5 +30,5 @@ resource "aws_security_group" "allow_remote_db" {
 }
 
 data "aws_vpc" "selected" {
-  id = "vpc-04478e1d67b7549a2b48"
+  id = "vpc-04478e1d67b7a2b48"
 }
