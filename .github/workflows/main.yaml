@@ -119,15 +119,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Terraform Init
+        id: init
+        run: terraform init
       - name: Cache Terraform
         uses: actions/cache@v2
         with:
           path: ${{ github.workspace }}/.terraform
           key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
-      - name: Terraform Init
-        id: init
-        run: terraform init
-
       - name: Terraform Plan
         id: Plan
         run: terraform plan
@@ -145,17 +144,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Terraform Init
+        id: init
+        run: terraform init
+      - name: Debug Info Init
+        run: ls -la ./*
       - name: Cache Terraform
         uses: actions/cache@v2
         with:
           path: ${{ github.workspace }}/.terraform
           key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
       - name: Debug Info Cache
-        run: ls -la ./*
-      - name: Terraform Init
-        id: init
-        run: terraform init
-      - name: Debug Info Init
         run: ls -la ./*
       - name: Terraform Apply
         run: terraform apply --auto-approve
