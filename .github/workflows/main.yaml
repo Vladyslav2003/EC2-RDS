@@ -158,7 +158,7 @@ jobs:
       - name: Debug Info Init
         run: ls -la ./*
       - name: Terraform Apply
-        run: terraform apply
+        run: terraform apply --auto-approve
 
 # name: "Terraform Menu"
 
