@@ -8,7 +8,7 @@ resource "aws_db_instance" "terraform_rds" {
   username = "admin"
   password = "Vlad.1303"
   publicly_accessible = true
-  vpc_security_group_ids = [aws_security_group.allow_remote_db.id]
+  # vpc_security_group_ids = [aws_security_group.allow_remote_db.id]
 }
 
 # output "rds_endpoint" {
