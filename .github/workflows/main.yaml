@@ -80,7 +80,7 @@ jobs:
         with:
           path: ${{ github.workspace }}/.terraform
           key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
-      - name: Debug Info Cache
-        run: ls -la ./*
+      # - name: Debug Info Cache
+      #   run: ls -la ./*
       - name: Terraform destroy
         run: terraform destroy --auto-approve
