@@ -69,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: terraform
     environment:
-      name: prod
+      name: des
     env:
       TF_VAR_number_of_instances: ${{ inputs.number_of_instances }}
     steps:
