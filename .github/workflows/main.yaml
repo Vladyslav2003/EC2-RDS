@@ -1,98 +1,3 @@
-# name: "Terraform"
- 
-# on:
-#  push:
-#    branches:
-#    - main
-#    paths:
-#    - terraform/**
-#  pull_request:
-#    branches:
-#    - main
-#    paths:
-#    - terraform/**
- 
-#  workflow_dispatch:
-#     inputs:
-#       number_of_instances:
-#         description: 'number_of_instances'
-#         required: true
-#         type: number
-
-
-# jobs:
-#  terraform:
-#    name: "Terraform"
-#    runs-on: ubuntu-latest
-#    defaults:
-#      run:
-#        shell: bash
-#        working-directory: ./terraform
- 
-#    steps:
-#      - name: Checkout the repository to the runner
-#        uses: actions/checkout@v2
- 
-#      - name: Setup Terraform with specified version on the runner
-#        uses: hashicorp/setup-terraform@v2
-#        with:
-#          terraform_version: 1.3.0
-    
-#      - name: Terraform init
-#        id: init
-#        run: terraform init -backend-config="bucket=$BUCKET_TF_STATE"
- 
-#      - name: Terraform format
-#        id: fmt
-#        run: terraform fmt -check
-    
-#      - name: Terraform validate
-#        id: validate
-#        run: terraform validate
- 
-#      - name: Terraform plan
-#        id: plan
-#        if: github.event_name == 'pull_request'
-#        run: terraform plan -no-color -input=false
-#        continue-on-error: true
-    
-#      - uses: actions/github-script@v6
-#        if: github.event_name == 'pull_request'
-#        env:
-#          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
-#        with:
-#          script: |
-#            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-#            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-#            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
-#            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
- 
-#            <details><summary>Show Plan</summary>
- 
-#            \`\`\`\n
-#            ${process.env.PLAN}
-#            \`\`\`
- 
-#            </details>
-#            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
- 
-#            github.rest.issues.createComment({
-#              issue_number: context.issue.number,
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              body: output
-#            })
- 
-#      - name: Terraform Plan Status
-#        if: steps.plan.outcome == 'failure'
-#        run: exit 1
- 
-#      - name: Terraform Apply
-#        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-#        run: terraform apply -auto-approve -input=false
-
-
-
 name: "Terraform"
 
 on:
@@ -104,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       number_of_instances:
-        description: 'number_of_instances'
+        description: "number_of_instances"
         required: true
         type: number
 
@@ -140,7 +45,7 @@ jobs:
     environment:
       name: prod
     env:
-     TF_VAR_number_of_instances: ${{ inputs.number_of_instances }}
+      TF_VAR_number_of_instances: ${{ inputs.number_of_instances }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -158,76 +63,24 @@ jobs:
         run: ls -la ./*
       - name: Terraform Apply
         run: terraform apply --auto-approve
- 
- terraform_Destroy:
-          name: "Terraform Destroy"
-          runs-on: ubuntu-latest
-          needs: terraform
-          environment:
-            name: prod
-          env:
-           TF_VAR_number_of_instances: ${{ inputs.number_of_instances }}
-          steps:
-            # - name: Checkout
-            #   uses: actions/checkout@v3
-            # - name: Terraform Init
-            #   id: init
-              # run: terraform init
-            - name: Debug Info Aplly
-              run: ls -la ./*
-            - name: Cache Terraform
-              uses: actions/cache@v2
-              with:
-                path: ${{ github.workspace }}/.terraform
-                key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
-            - name: Debug Info Cache
-              run: ls -la ./*
-            - name: Terraform destroy
-              run: terraform destroy --auto-approve
-  
-  
-  
-  
-  
 
-# name: "Terraform Menu"
-
-# on:
-#   workflow_dispatch:
-#     inputs:
-#       menu-option:
-#        description: "Select an option"
-#          required: true
-#          default: "plan"
-#          options:
-#           - "plan"
-#           - "apply"
-#           - "destroy"
-
-# jobs:
-#   terraform:
-#     name: "Terraform"
-#     runs-on: ubuntu-latest
-#     permissions:
-#       pull-requests: write
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v3
-
-#       - name: Terraform Init
-#         run: terraform init
-
-#       - name: Set Terraform Action
-#         id: set-terraform-action
-#         run: echo "echo ::set-output name=terraform_action::${{ github.event.inputs.menu-option }}"
-
-#   apply_or_destroy:
-#     name: "Apply or Destroy"
-#     runs-on: ubuntu-latest
-#     needs: terraform
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v3
-
-#       - name: Terraform Apply or Destroy
-#         run: terraform ${{ needs.terraform.outputs.terraform_action }}
+  terraform_Destroy:
+    name: "Terraform Destroy"
+    runs-on: ubuntu-latest
+    needs: terraform
+    environment:
+      name: prod
+    env:
+      TF_VAR_number_of_instances: ${{ inputs.number_of_instances }}
+    steps:
+      - name: Debug Info Aplly
+        run: ls -la ./*
+      - name: Cache Terraform
+        uses: actions/cache@v2
+        with:
+          path: ${{ github.workspace }}/.terraform
+          key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
+      - name: Debug Info Cache
+        run: ls -la ./*
+      - name: Terraform destroy
+        run: terraform destroy --auto-approve
