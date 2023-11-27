@@ -73,8 +73,8 @@ jobs:
     env:
       TF_VAR_number_of_instances: ${{ inputs.number_of_instances }}
     steps:
-      - name: Debug Info Aplly
-        run: ls -la ./*
+      # - name: Debug Info Aplly
+      #   run: ls -la ./*
       - name: Cache Terraform
         uses: actions/cache@v2
         with:
